@@ -1,6 +1,7 @@
 # 2023_Parcel_Viewer
  1. Rawan Hinzman
  2. Maya Edstrom
+ 3. Lindsey Samotis
 
 
 ### Final Project Proposal
