@@ -8,7 +8,7 @@ function createMap(){
     map = L.map('map', {
         center: [46, -87],
         zoom: 8
-    
+
     });
 
     //add OSM base tilelayer
@@ -16,11 +16,11 @@ function createMap(){
 
     //Esri API key variable 
     var apiKey= "AAPK2aa8afd0970b4e43bc5133b348839475UgngmRk2ZE6Yv_uOw2KAGR1v4BvVPtn_3IoYJPmznS3CJc90Q3VyToGXStfctrVQ";
-   
+
     //Adds API to map
     L.esri.Vector.vectorBasemapLayer(basemapEnum, {
         apiKey: apiKey
-      }).addTo(map);
+    }).addTo(map);
 
     //call getData function
     // getData(map);
