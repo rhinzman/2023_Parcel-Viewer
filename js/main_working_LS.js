@@ -15,7 +15,7 @@ function createMap(){
     L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
 
     //Esri API key variable 
-    var apiKey= "AAPK2aa8afd0970b4e43bc5133b348839475UgngmRk2ZE6Yv_uOw2KAGR1v4BvVPtn_3IoYJPmznS3CJc90Q3VyToGXStfctrVQ";
+    var apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
 
     //Adds API to map
     L.esri.Vector.vectorBasemapLayer(basemapEnum, {
