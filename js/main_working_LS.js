@@ -22,6 +22,32 @@ function createMap(){
         apiKey: apiKey
     }).addTo(map);
 
+    var township = L.esri
+        .featureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6"
+        });
+
+      township.addTo(map);
+
+      var county = L.esri
+        .featureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1"
+        });
+
+      county.addTo(map);
+
+      var zipCode = L.esri
+        .featureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
+        });
+        zipCode.addTo(map);
+
+    var parcelLayer = L.esri
+        .featureLayer({
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3"
+        });
+        parcelLayer.addTo(map);
+
     //call getData function
     // getData(map);
 };
