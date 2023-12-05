@@ -12,19 +12,20 @@ function createMap(){
     });
 
     //add OSM base tilelayer
-    L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
+    const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
 
     //Esri API key variable 
     var apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
-
-    //Adds API to map
-    L.esri.Vector.vectorBasemapLayer(basemapEnum, {
-        apiKey: apiKey
-    }).addTo(map);
+  
+            //Adds API to map
+            L.esri.Vector.vectorBasemapLayer(basemap, {
+              apiKey: apiKey
+          }).addTo(map);
+    
 
     var township = L.esri
         .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6"
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/0"
         });
 
       township.addTo(map);
