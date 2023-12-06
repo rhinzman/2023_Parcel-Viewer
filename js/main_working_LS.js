@@ -1,34 +1,33 @@
-//declare map variable globally so all functions have access
-var map;
-//var attributes;
-
 //step 1 create map
 function createMap(){
-    //create the map
-    map = L.map('map', {
-        center: [46, -87],
-        zoom: 8
-
-    });
-
-    //add OSM base tilelayer
-    const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
-
-    //Esri API key variable 
-    var apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
+  //create the map
+  const map = L.map('map').setView([46, -87], 8);
   
-            //Adds API to map
-            L.esri.Vector.vectorBasemapLayer(basemap, {
-              apiKey: apiKey
-          }).addTo(map);
+  //Initializae API key
+  const apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
+
+  //add OSM base tilelayer
+  const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
+
     
+  // URL of the feature layer
+  var featureLayerUrl = "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6";
 
-    var township = L.esri
-        .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/0"
-        });
+  // Create the feature layer
+  var featureLayer = L.esri.featureLayer({
+    url: featureLayerUrl,
+    apiKey: apiKey // Include the API key if required
+  });
 
-      township.addTo(map);
+  // Add the feature layer to the map
+  featureLayer.addTo(map);
+
+  // Existing code...
+          //   //Adds API to map
+          //   L.esri.Vector.vectorBasemapLayer(basemap, {
+          //     apiKey: apiKey
+          // }).addTo(map);
+    
 
       var county = L.esri
         .featureLayer({
