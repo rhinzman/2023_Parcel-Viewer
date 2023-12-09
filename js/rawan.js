@@ -64,7 +64,7 @@ function createMap(){
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle
         }).addTo(map);
         parcelLayer.bindPopup(function(layer){
-          return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>', layer.feature.properties);
+          return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
         });
         const overlayMaps = {
           "Township": township,
