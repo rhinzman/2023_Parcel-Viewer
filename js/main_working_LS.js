@@ -76,7 +76,8 @@ function createMap(){
 };
 
 function createParcelPopup(properties){
-  var popUp= "<p><b>Parcel: </b> " + properties["Name"] + "</p>";
+ 
+  var popUp= "<p><b>Parcel: </b> " + properties.attribute;
   return popUp; 
 }; 
 
