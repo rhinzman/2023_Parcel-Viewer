@@ -12,7 +12,13 @@ function createMap(){
   const apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
 
   //add OSM base tilelayer
-  const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
+  // const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
+  var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+	minZoom: 0,
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	ext: 'png'
+}).addTo(map);
 
     
   // URL of the feature layer
@@ -55,10 +61,13 @@ function createMap(){
     var parcelLayer = L.esri
         .featureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle
+        }).addTo(map);
+        parcelLayer.bindPopup(function(layer){
+          return L.Util.template('<p><b>{Name}: </b> {attribute}</p>', layer.feature.Name);
         });
+        console.log(parcelLayer);
         
-        parcelLayer.addTo(map);
-        parcelLayer.bindPopup(createParcelPopup);
+
         const overlayMaps = {
           "Township": township,
           "County": county,
@@ -90,7 +99,7 @@ function createMap(){
     div.innerHTML += "<h4>Legend</h4>";
     div.innerHTML += '<i style="background: #477AC2"></i><span>County</span><br>';
     div.innerHTML += '<i style="background: #448D40"></i><span>Township</span><br>';
-    div.innerHTML += '<i style="background: #FF00FF"></i><span>Parcel</span><br>';
+    div.innerHTML += '<i style="background: #FA8072"></i><span>Parcel</span><br>';
     div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
     
     return div;
@@ -108,9 +117,9 @@ function createParcelPopup(properties){
 // Set up style for garden polygons
 function parcelStyle(feature) {
   return {
-    fillColor: "#FF00FF",
+    fillColor: "#FA8072",
     fillOpacity: 2,
-    color: '#B04173',
+    color: '#CD5C5C',
     weight: 4,
   };
 }

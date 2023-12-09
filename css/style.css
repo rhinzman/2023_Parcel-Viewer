@@ -5,7 +5,7 @@
     padding: 0;
   }
   #map {
-    height: 1100px;
+    height: 1000px;
     width: 100%;
     display: inline-block;
 }
@@ -26,7 +26,7 @@
 
 /*Legend specific*/
 .legend {
-  padding: 6px 8px;
+  padding: 8px 10px;
   font: 14px Arial, Helvetica, sans-serif;
   background: white;
   background: rgba(255, 255, 255, 0.8);
