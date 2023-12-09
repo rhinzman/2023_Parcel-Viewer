@@ -22,17 +22,6 @@ function createMap(){
 }).addTo(map);
 var baseMaps = {Stadia_AlidadeSmoothDark, basemap};
     
-  // URL of the feature layer
-  var featureLayerUrl = "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6";
-
-  // Create the feature layer
-  var featureLayer = L.esri.featureLayer({
-    url: featureLayerUrl,
-    apiKey: apiKey // Include the API key if required
-  }).addTo(map);
-
-  // Add the feature layer to the map
-  featureLayer.addTo(map);
 
       var township = L.esri
       .featureLayer({
@@ -53,11 +42,11 @@ var baseMaps = {Stadia_AlidadeSmoothDark, basemap};
 
       county.addTo(map);
     
-      var zipCode = L.esri
-        .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
-        });
-        zipCode.addTo(map);
+      // var zipCode = L.esri
+      //   .featureLayer({
+      //     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
+      //   });
+      //   zipCode.addTo(map);
 
     var parcelLayer = L.esri
         .featureLayer({
@@ -71,14 +60,14 @@ var baseMaps = {Stadia_AlidadeSmoothDark, basemap};
         const overlayMaps = {
           "Township": township,
           "County": county,
-          "Zip Code": zipCode,
+          // "Zip Code": zipCode,
           "Parcel": parcelLayer
         };
         const layerControl ={
           "Parcel": parcelLayer,
           "Township": township,
           "County": county,
-          "Zip Code": zipCode
+          // "Zip Code": zipCode
         };
 
 
