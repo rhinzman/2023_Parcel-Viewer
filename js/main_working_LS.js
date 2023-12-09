@@ -1,7 +1,12 @@
 //step 1 create map
+var attributes; 
+
 function createMap(){
+  
   //create the map
-  const map = L.map('map').setView([46, -87], 8);
+  const map = L.map('map').setView([45.87, -87], 9);
+  
+
   
   //Initializae API key
   const apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
@@ -22,12 +27,12 @@ function createMap(){
   // Add the feature layer to the map
   featureLayer.addTo(map);
 
-  // Existing code...
-          //   //Adds API to map
-          //   L.esri.Vector.vectorBasemapLayer(basemap, {
-          //     apiKey: apiKey
-          // }).addTo(map);
-    
+      var township = L.esri
+      .featureLayer({
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6"
+      });
+
+      township.addTo(map);
 
       var county = L.esri
         .featureLayer({
@@ -44,26 +49,47 @@ function createMap(){
 
     var parcelLayer = L.esri
         .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3"
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle
         });
+        
+        
         parcelLayer.addTo(map);
+        parcelLayer.bindPopup(createParcelPopup);
+        
 
-    //call getData function
-    // getData(map);
+
+    /*Legend specific*/
+  var legend = L.control({ position: "bottomleft" });
+
+  legend.onAdd = function(map) {
+    var div = L.DomUtil.create("div", "legend");
+    div.innerHTML += "<h4>Legend</h4>";
+    div.innerHTML += '<i style="background: #477AC2"></i><span>County</span><br>';
+    div.innerHTML += '<i style="background: #448D40"></i><span>Township</span><br>';
+    div.innerHTML += '<i style="background: #FF00FF"></i><span>Parcel</span><br>';
+    div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
+    
+    return div;
+  };
+
+  legend.addTo(map);
 };
 
+function createParcelPopup(properties){
+  var popUp= "<p><b>Parcel: </b> " + properties["Name"] + "</p>";
+  return popUp; 
+}; 
 
-// //function to retrieve the data and place it on the map
-// function getData(){
-//     //load the data
-//     fetch("data/County.geojson") //placeholder for our county data 
-//         .then(function(response){
-//             return response.json();
-//         })
-//         .then(function(json){
-//             //create a Leaflet GeoJSON layer and add it to the map
-//             L.geoJson(json).addTo(map);
-//         })
-// };
+// Set up style for garden polygons
+function parcelStyle(feature) {
+  return {
+    fillColor: "#FF00FF",
+    fillOpacity: 2,
+    color: '#B04173',
+    weight: 4,
+  };
+}
+
+
 
 document.addEventListener('DOMContentLoaded',createMap)
