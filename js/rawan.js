@@ -1,3 +1,4 @@
+
 //step 1 create map
 var attributes; 
 
@@ -44,14 +45,14 @@ function createMap(){
       });
 
       township.addTo(map);
-
+    
       var county = L.esri
         .featureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1"
         });
 
       county.addTo(map);
-
+    
       var zipCode = L.esri
         .featureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
@@ -63,11 +64,8 @@ function createMap(){
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle
         }).addTo(map);
         parcelLayer.bindPopup(function(layer){
-          return L.Util.template('<p><b>{Name}: </b> {attribute}</p>', layer.feature.Name);
+          return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>', layer.feature.properties);
         });
-        console.log(parcelLayer);
-        
-
         const overlayMaps = {
           "Township": township,
           "County": county,
@@ -84,9 +82,6 @@ function createMap(){
 
         L.control.layers(layerControl,overlayMaps).addTo(map);
     
-        
-    
-   
 
     // Add the legend
 
@@ -123,6 +118,7 @@ function parcelStyle(feature) {
     weight: 4,
   };
 }
+
 
 
 
