@@ -1,5 +1,7 @@
+
 //step 1 create map
 var attributes; 
+var selection;
 
 function createMap(){
   
@@ -13,49 +15,79 @@ function createMap(){
 
   //add OSM base tilelayer
   const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
+  var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+	minZoom: 0,
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	ext: 'png'
+}).addTo(map);
+var baseMaps = {Stadia_AlidadeSmoothDark, basemap};
 
-    
-  // URL of the feature layer
-  var featureLayerUrl = "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6";
+// define function to handle click events on parcels
+function parcelOnEachFeature(feature, layer){
+  layer.on({
+    click: function(e) {
+      if (selection) {
+        parcelLayerLayer.resetStyle(selection);
+      }
+              
+      e.target.setStyle(parcelSelectedStyle());
+      selection = e.target;
 
-  // Create the feature layer
-  var featureLayer = L.esri.featureLayer({
-    url: featureLayerUrl,
-    apiKey: apiKey // Include the API key if required
+      L.DomEvent.stopPropagation(e); // stop click event from being propagated down to other elements
+    }
   });
-
-  // Add the feature layer to the map
-  featureLayer.addTo(map);
+}
+    
 
       var township = L.esri
       .featureLayer({
-        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6"
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6", style: townshipStyle
+    
       });
 
       township.addTo(map);
-
+    
       var county = L.esri
         .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1"
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1", style:countyStyle
         });
 
       county.addTo(map);
-
-      var zipCode = L.esri
-        .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
-        });
-        zipCode.addTo(map);
+    
+      // var zipCode = L.esri
+      //   .featureLayer({
+      //     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
+      //   });
+      //   zipCode.addTo(map);
 
     var parcelLayer = L.esri
         .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle
+          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle, onEachFeature: parcelOnEachFeature
+        }).addTo(map);
+        parcelLayer.bindPopup(function(layer){
+          return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
         });
         
         
-        parcelLayer.addTo(map);
-        parcelLayer.bindPopup(createParcelPopup);
-        
+        const overlayMaps = {
+          "Township": township,
+          "County": county,
+          // "Zip Code": zipCode,
+          "Parcel": parcelLayer
+        };
+        const layerControl ={
+          "Parcel": parcelLayer,
+          "Township": township,
+          "County": county,
+          // "Zip Code": zipCode
+        };
+
+
+        L.control.layers(baseMaps,overlayMaps).addTo(map);
+    
+
+    // Add the legend
 
 
     /*Legend specific*/
@@ -66,7 +98,7 @@ function createMap(){
     div.innerHTML += "<h4>Legend</h4>";
     div.innerHTML += '<i style="background: #477AC2"></i><span>County</span><br>';
     div.innerHTML += '<i style="background: #448D40"></i><span>Township</span><br>';
-    div.innerHTML += '<i style="background: #FF00FF"></i><span>Parcel</span><br>';
+    div.innerHTML += '<i style="background: #FA8072"></i><span>Parcel</span><br>';
     div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
     
     return div;
@@ -81,16 +113,44 @@ function createParcelPopup(properties){
   return popUp; 
 }; 
 
-// Set up style for garden polygons
+// Set up style for parcel polys
 function parcelStyle(feature) {
   return {
-    fillColor: "#FF00FF",
-    fillOpacity: 2,
-    color: '#B04173',
-    weight: 4,
+    color: '000000',
+    weight: 2,
   };
 }
 
+function townshipStyle(feature){
+  return{
+    color: "#4C0073", 
+    weight: 1,
+  }
+}
+function countyStyle(feature){
+  return{
+    color: "#ffffff",
+    weight: 1,
+  
+  };
+}
+// Blue symbol for selected gardens
+function parcelSelectedStyle(feature) {
+  return {
+    fillColor: "#00FFFB",
+    fillOpacity: 1,
+    color: '#0000FF',
+    weight: 4
+  };
+}
 
+// define and register event handler for click events to unselect features when clicked anywhere else on the map
+map.addEventListener('click', function(e) {
+  if (selection) {
+     gardenLayer.resetStyle(selection);
+
+     selection = null;
+  }
+});
 
 document.addEventListener('DOMContentLoaded',createMap)
