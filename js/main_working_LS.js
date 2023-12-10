@@ -96,10 +96,10 @@ function parcelOnEachFeature(feature, layer){
   legend.onAdd = function(map) {
     var div = L.DomUtil.create("div", "legend");
     div.innerHTML += "<h4>Legend</h4>";
-    div.innerHTML += '<i style="background: #477AC2"></i><span>County</span><br>';
-    div.innerHTML += '<i style="background: #448D40"></i><span>Township</span><br>';
-    div.innerHTML += '<i style="background: #FA8072"></i><span>Parcel</span><br>';
-    div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
+    div.innerHTML += '<i style="background: #ffffff"></i><span>County</span><br>';
+    div.innerHTML += '<i style="background: #4C0073"></i><span>Township</span><br>';
+    div.innerHTML += '<i style="background: #000000"></i><span>Parcel</span><br>';
+    // div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
     
     return div;
   };
@@ -116,15 +116,15 @@ function createParcelPopup(properties){
 // Set up style for parcel polys
 function parcelStyle(feature) {
   return {
-    color: '000000',
-    weight: 2,
+    color: '#000000',
+    weight: 1.5,
   };
 }
 
 function townshipStyle(feature){
   return{
     color: "#4C0073", 
-    weight: 1,
+    weight: 2,
   }
 }
 function countyStyle(feature){
