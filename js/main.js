@@ -28,7 +28,7 @@ function parcelOnEachFeature(feature, layer){
   layer.on({
     click: function(e) {
       if (selection) {
-        parcelLayerLayer.resetStyle(selection);
+        parcelLayer.resetStyle(selection);
       }
               
       e.target.setStyle(parcelSelectedStyle());
@@ -38,8 +38,6 @@ function parcelOnEachFeature(feature, layer){
     }
   });
 }
-    
-
       var township = L.esri
       .featureLayer({
         url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6", style: townshipStyle
@@ -69,7 +67,7 @@ function parcelOnEachFeature(feature, layer){
           return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
         });
         
-        
+    
         const overlayMaps = {
           "Township": township,
           "County": county,
@@ -85,7 +83,7 @@ function parcelOnEachFeature(feature, layer){
 
 
         L.control.layers(baseMaps,overlayMaps).addTo(map);
-    
+  
 
     // Add the legend
 
@@ -98,7 +96,7 @@ function parcelOnEachFeature(feature, layer){
     div.innerHTML += "<h4>Legend</h4>";
     div.innerHTML += '<i style="background: #ffffff"></i><span>County</span><br>';
     div.innerHTML += '<i style="background: #4C0073"></i><span>Township</span><br>';
-    div.innerHTML += '<i style="background: #000000"></i><span>Parcel</span><br>';
+    div.innerHTML += '<i style="background: #85929E"></i><span>Parcel</span><br>';
     // div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
     
     return div;
@@ -116,8 +114,8 @@ function createParcelPopup(properties){
 // Set up style for parcel polys
 function parcelStyle(feature) {
   return {
-    color: '#000000',
-    weight: 1.5,
+    color: '#85929E',
+    weight: 1,
   };
 }
 
@@ -137,15 +135,22 @@ function countyStyle(feature){
 // Blue symbol for selected gardens
 function parcelSelectedStyle(feature) {
   return {
-    fillColor: "#00FFFB",
-    fillOpacity: 1,
-    color: '#0000FF',
-    weight: 4
+    // fillColor: "#00FFFB",
+    // fillOpacity: 1,
+    color: '#00FFFB',
+    weight: 2
   };
 }
 
 // define and register event handler for click events to unselect features when clicked anywhere else on the map
 map.addEventListener('click', function(e) {
+  if (selection) {
+     gardenLayer.resetStyle(selection);
+
+     selection = null;
+  }
+});
+removeEventListener('click', function(e) {
   if (selection) {
      gardenLayer.resetStyle(selection);
 

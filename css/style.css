@@ -13,7 +13,7 @@
 
 #text {
 	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-	font-size: 20px;
+	font-size: 25px;
 	font-size: 0.75rem;
 	line-height: 1.5;
 }
@@ -66,5 +66,8 @@ label {
   font:
     1rem 'Fira Sans',
     sans-serif;
+}
+.leaflet-popup-content p {
+  margin: 0.2em 0;
 }
 
