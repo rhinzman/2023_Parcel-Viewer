@@ -180,7 +180,7 @@ function countyStyle(feature){
   
   };
 }
-// Blue symbol for selected gardens
+// Blue symbol for selected parcels
 function parcelSelectedStyle(feature) {
   return {
     // fillColor: "#00FFFB",
@@ -193,14 +193,14 @@ function parcelSelectedStyle(feature) {
 // define and register event handler for click events to unselect features when clicked anywhere else on the map
 map.addEventListener('click', function(e) {
   if (selection) {
-     gardenLayer.resetStyle(selection);
+     parcelLayer.resetStyle(selection);
 
      selection = null;
   }
 });
 removeEventListener('click', function(e) {
   if (selection) {
-     gardenLayer.resetStyle(selection);
+     parcelLayer.resetStyle(selection);
 
      selection = null;
   }

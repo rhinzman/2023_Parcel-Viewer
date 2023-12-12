@@ -193,7 +193,7 @@ function parcelSelectedStyle(feature) {
 // define and register event handler for click events to unselect features when clicked anywhere else on the map
 map.addEventListener('click', function(e) {
   if (selection) {
-     gardenLayer.resetStyle(selection);
+     parcelLayer.resetStyle(selection);
 
      selection = null;
   }
