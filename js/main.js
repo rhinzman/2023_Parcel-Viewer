@@ -52,17 +52,19 @@ function parcelOnEachFeature(feature, layer){
         });
 
       county.addTo(map);
-    
-      // var zipCode = L.esri
-      //   .featureLayer({
-      //     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
-      //   });
-      //   zipCode.addTo(map);
+  
 
     var parcelLayer = L.esri
         .featureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle, onEachFeature: parcelOnEachFeature
         }).addTo(map);
+
+        // const select = document.getElementById("whereClauseSelect");
+        // select.addEventListener("change", () => {
+        //   if (select.feature !== "") {
+        //     parcels.setWhere(select.feature);
+        //   }
+        // });
         parcelLayer.bindPopup(function(layer){
           return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
         });
@@ -84,7 +86,53 @@ function parcelOnEachFeature(feature, layer){
 
         L.control.layers(baseMaps,overlayMaps).addTo(map);
   
-
+        L.Control.QueryControl = L.Control.extend({
+          onAdd: function (map) {
+            const whereClauses = [
+              "Choose a Township",
+              "Baldwin",
+              "Ford River",
+              "Garden",
+              "Maple Ridge",
+              "Masonville",
+              "Nahma",
+              "Rapid River",
+              "Wells",
+              "Bark River",
+              "Escabana",
+              "Gladstone",
+              "Bay De Noc",
+              "Fairbanks",
+              "Ensign",
+              "Brampton",
+              "Cornell",
+            ];
+            const select = L.DomUtil.create("select", "");
+            select.setAttribute("Township", "whereClauseSelect");
+            select.setAttribute("style", "font-size: 16px;padding:4px 8px;");
+            whereClauses.forEach(function (whereClause) {
+              let option = L.DomUtil.create("option");
+              option.innerHTML = whereClause;
+              select.appendChild(option);
+            });
+            return select;
+          },
+  
+          onRemove: function (map) {
+            // Nothing to do here
+          }
+        });
+  
+        L.control.queryControl = function (opts) {
+          return new L.Control.QueryControl(opts);
+        };
+  
+        L.control
+          .queryControl({
+            position: "bottomright"
+          })
+          .addTo(map);
+          
     // Add the legend
 
 

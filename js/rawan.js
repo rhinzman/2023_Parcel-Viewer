@@ -52,21 +52,17 @@ function parcelOnEachFeature(feature, layer){
         });
 
       county.addTo(map);
-    
-      // var zipCode = L.esri
-      //   .featureLayer({
-      //     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/2"
-      //   });
-      //   zipCode.addTo(map);
+  
 
     var parcelLayer = L.esri
         .featureLayer({
           url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle, onEachFeature: parcelOnEachFeature
         }).addTo(map);
+
         // const select = document.getElementById("whereClauseSelect");
-        // select.addEventListener("Township", () => {
-        //   if (select.value !== "") {
-        //     parcelLayer.setWhere(select.value);
+        // select.addEventListener("change", () => {
+        //   if (select.feature !== "") {
+        //     parcels.setWhere(select.feature);
         //   }
         // });
         parcelLayer.bindPopup(function(layer){
@@ -93,7 +89,7 @@ function parcelOnEachFeature(feature, layer){
         L.Control.QueryControl = L.Control.extend({
           onAdd: function (map) {
             const whereClauses = [
-              "Choose a township",
+              "Choose a Township",
               "Baldwin",
               "Ford River",
               "Garden",
@@ -112,7 +108,7 @@ function parcelOnEachFeature(feature, layer){
               "Cornell",
             ];
             const select = L.DomUtil.create("select", "");
-            select.setAttribute("Name", "whereClauseSelect");
+            select.setAttribute("Township", "whereClauseSelect");
             select.setAttribute("style", "font-size: 16px;padding:4px 8px;");
             whereClauses.forEach(function (whereClause) {
               let option = L.DomUtil.create("option");
