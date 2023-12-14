@@ -28,6 +28,7 @@ function parcelSelectedStyle() {
 var map;
 var townshipLayer;
 var selection;
+
 function createMap(){
   // Create the map
   map = L.map('map').setView([45.87, -87], 9);
@@ -35,11 +36,12 @@ function createMap(){
   L.tileLayer.provider('Stadia.AlidadeSmoothDark').addTo(map);
   // Add other layers
   // define function to handle click events on parcels
+// define function to handle click events on parcels
 function parcelOnEachFeature(feature, layer){
   layer.on({
     click: function(e) {
       if (selection) {
-        gardenLayer.resetStyle(selection);
+        parcelLayer.resetStyle(selection);
       }
               
       e.target.setStyle(parcelSelectedStyle());
@@ -53,10 +55,14 @@ function parcelOnEachFeature(feature, layer){
     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6",
     style: townshipStyle
   }).addTo(map);
+ 
+
+
   console.log(townshipLayer);
   var countyLayer = L.esri.featureLayer({
     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1",
-    style: countyStyle
+    style: countyStyle,
+  pane:"townshipLayer"
   }).addTo(map);
   var parcelLayer = L.esri.featureLayer({
     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3",
@@ -101,6 +107,7 @@ function parcelOnEachFeature(feature, layer){
 
   // Reset the style of all township features when "Choose a Township" is selected
   townshipLayer.setStyle(townshipStyle);
+
 }
 }
 
@@ -177,8 +184,7 @@ function parcelOnEachFeature(feature, layer){
   // Blue symbol for selected parcels
 function parcelSelectedStyle(feature) {
   return {
-    // fillColor: "#00FFFB",
-    // fillOpacity: 1,
+  
     color: '#00FFFB',
     weight: 2
   };
