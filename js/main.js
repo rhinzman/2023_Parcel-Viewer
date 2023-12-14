@@ -202,14 +202,14 @@ function parcelSelectedStyle(feature) {
 }
   map.addEventListener('click', function(e) {
     if (selection) {
-       gardenLayer.resetStyle(selection);
+       parcelLayer.resetStyle(selection);
   
        selection = null;
     }
   });
   removeEventListener('click', function(e) {
     if (selection) {
-       gardenLayer.resetStyle(selection);
+       parcelLayer.resetStyle(selection);
   
        selection = null;
     }
