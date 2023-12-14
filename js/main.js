@@ -1,34 +1,45 @@
-
-//step 1 create map
-var attributes; 
+// Set up style for parcel polys
+function parcelStyle(feature) {
+  return {
+    color: '#85929E',
+    weight: 1,
+  };
+}
+function townshipStyle(feature){
+  return{
+    color: "#4C0073",
+    weight: 2,
+  };
+}
+function countyStyle(feature){
+  return{
+    color: "#FFFFFF",
+    weight: 1,
+  };
+}
+// Blue symbol for selected parcels
+function parcelSelectedStyle() {
+  return {
+    color: '#00FFFB',
+    weight: 2
+  };
+}
+// Create map
+var map;
+var townshipLayer;
 var selection;
-
 function createMap(){
-  
-  //create the map
-  const map = L.map('map').setView([45.87, -87], 9);
-  
-
-  
-  //Initializae API key
-  const apiKey= "AAPKe3ed074605b74de0ba2d1e373dcc65bbcvEnFg_vWzBUO-ysOviHMlflp1cn4mNFShcpno5Good4EFgVfdiVJY52BX607Msp";
-
-  //add OSM base tilelayer
-  const basemap= L.tileLayer.provider('Stadia.StamenTerrain').addTo(map);
-  var Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
-	minZoom: 0,
-	maxZoom: 20,
-	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	ext: 'png'
-}).addTo(map);
-var baseMaps = {Stadia_AlidadeSmoothDark, basemap};
-
-// define function to handle click events on parcels
+  // Create the map
+  map = L.map('map').setView([45.87, -87], 9);
+  // Add OSM base tilelayer
+  L.tileLayer.provider('Stadia.AlidadeSmoothDark').addTo(map);
+  // Add other layers
+  // define function to handle click events on parcels
 function parcelOnEachFeature(feature, layer){
   layer.on({
     click: function(e) {
       if (selection) {
-        parcelLayer.resetStyle(selection);
+        gardenLayer.resetStyle(selection);
       }
               
       e.target.setStyle(parcelSelectedStyle());
@@ -38,149 +49,132 @@ function parcelOnEachFeature(feature, layer){
     }
   });
 }
-      var township = L.esri
-      .featureLayer({
-        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6", style: townshipStyle
+  townshipLayer = L.esri.featureLayer({
+    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6",
+    style: townshipStyle
+  }).addTo(map);
+  console.log(townshipLayer);
+  var countyLayer = L.esri.featureLayer({
+    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1",
+    style: countyStyle
+  }).addTo(map);
+  var parcelLayer = L.esri.featureLayer({
+    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3",
+    style: parcelStyle,
+    onEachFeature: parcelOnEachFeature
     
+  }).addTo(map);
+  parcelLayer.bindPopup(function(layer){
+    return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
+  });
+  // Define the dropdown change handler function
+  function onDropdownChange(selectedTownship) {
+    if (selectedTownship !== "Choose a Township") {
+      townshipLayer.query().where("Name = '" + selectedTownship + "'").run(function(error, featureCollection){
+        if (error) {
+          console.error('Query error:', error);
+          return;
+        }
+        if (featureCollection.features.length > 0) {
+          var bounds = L.geoJson(featureCollection).getBounds();
+          map.fitBounds(bounds);
+           // Reset the style of all township features
+        townshipLayer.setStyle(townshipStyle);
+        // Reset the style of all parcel features
+        parcelLayer.setStyle(parcelStyle);
+        // Reset the style of all county features
+        countyLayer.setStyle(countyStyle);
+        // Zoom to the selected township feature
+        map.fitBounds(townshipLayer.getBounds());
+        // Get the selected township feature
+        console.log(townshipLayer);
+        // Highlight the selected township feature
+        var selectedFeature = featureCollection.features[0];
+        var selectedLayer = townshipLayer.getLayer(selectedFeature.NAME);
+        selectedLayer.setStyle({
+          color: '#00FFFB',
+          weight: 3
       });
+    }
+  });
+} else {
 
-      township.addTo(map);
-    
-      var county = L.esri
-        .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1", style:countyStyle
-        });
+  // Reset the style of all township features when "Choose a Township" is selected
+  townshipLayer.setStyle(townshipStyle);
+}
+}
 
-      county.addTo(map);
-  
-
-    var parcelLayer = L.esri
-        .featureLayer({
-          url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3", style:parcelStyle, onEachFeature: parcelOnEachFeature
-        }).addTo(map);
-
-        // const select = document.getElementById("whereClauseSelect");
-        // select.addEventListener("change", () => {
-        //   if (select.feature !== "") {
-        //     parcels.setWhere(select.feature);
-        //   }
-        // });
-        parcelLayer.bindPopup(function(layer){
-          return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
-        });
-        
-    
-        const overlayMaps = {
-          "Township": township,
-          "County": county,
-          // "Zip Code": zipCode,
-          "Parcel": parcelLayer
-        };
-        const layerControl ={
-          "Parcel": parcelLayer,
-          "Township": township,
-          "County": county,
-          // "Zip Code": zipCode
-        };
-
-
-        L.control.layers(baseMaps,overlayMaps).addTo(map);
-  
-        L.Control.QueryControl = L.Control.extend({
-          onAdd: function (map) {
-            const whereClauses = [
-              "Choose a Township",
-              "Baldwin",
-              "Ford River",
-              "Garden",
-              "Maple Ridge",
-              "Masonville",
-              "Nahma",
-              "Rapid River",
-              "Wells",
-              "Bark River",
-              "Escabana",
-              "Gladstone",
-              "Bay De Noc",
-              "Fairbanks",
-              "Ensign",
-              "Brampton",
-              "Cornell",
-            ];
-            const select = L.DomUtil.create("select", "");
-            select.setAttribute("Township", "whereClauseSelect");
-            select.setAttribute("style", "font-size: 16px;padding:4px 8px;");
-            whereClauses.forEach(function (whereClause) {
-              let option = L.DomUtil.create("option");
-              option.innerHTML = whereClause;
-              select.appendChild(option);
-            });
-            return select;
-          },
-  
-          onRemove: function (map) {
-            // Nothing to do here
-          }
-        });
-  
-        L.control.queryControl = function (opts) {
-          return new L.Control.QueryControl(opts);
-        };
-  
-        L.control
-          .queryControl({
-            position: "bottomright"
-          })
-          .addTo(map);
-          
-    // Add the legend
-
-
-    /*Legend specific*/
+  // Add the control layers
+  var baseMaps = {
+    "Stadia.AlidadeSmoothDark": L.tileLayer.provider('Stadia.AlidadeSmoothDark'),
+    "Stadia.StamenTerrain": L.tileLayer.provider('Stadia.StamenTerrain')
+  };
+  var overlayMaps = {
+    "Township": townshipLayer,
+    "County": countyLayer,
+    "Parcel": parcelLayer
+  };
+  L.control.layers(baseMaps, overlayMaps).addTo(map);
+  // Define the QueryControl
+  L.Control.QueryControl = L.Control.extend({
+    onAdd: function (map) {
+      var div = L.DomUtil.create('div', 'query-control');
+      var select = L.DomUtil.create('select', 'whereClauseSelect', div);
+      select.setAttribute('style', 'font-size: 16px;padding:4px 8px;');
+      var whereClauses = [
+        "Choose a Township",
+        "Baldwin",
+        "Ford River",
+        "Garden",
+        "Maple Ridge",
+        "Masonville",
+        "Nahma",
+        "Rapid River",
+        "Wells",
+        "Bark River",
+        "Escanaba",
+        "Gladstone",
+        "Bay De Noc",
+        "Fairbanks",
+        "Ensign",
+        "Brampton",
+        "Cornell"
+      ];
+      whereClauses.forEach(function (clause) {
+        var option = L.DomUtil.create('option', '', select);
+        option.value = clause;
+        option.innerHTML = clause;
+      });
+      L.DomEvent.addListener(select, 'change', function(e) {
+        onDropdownChange(e.target.value);
+      });
+      return div;
+    }
+  });
+  L.control.queryControl = function (opts) {
+    return new L.Control.QueryControl(opts);
+  };
+  L.control.queryControl({ position: "bottomright" }).addTo(map);
+  // Add the legend
   var legend = L.control({ position: "bottomleft" });
-
   legend.onAdd = function(map) {
-    var div = L.DomUtil.create("div", "legend");
+    var div = L.DomUtil.create('div', 'legend');
     div.innerHTML += "<h4>Legend</h4>";
-    div.innerHTML += '<i style="background: #ffffff"></i><span>County</span><br>';
+    div.innerHTML += '<i style="background: #FFFFFF"></i><span>County</span><br>';
     div.innerHTML += '<i style="background: #4C0073"></i><span>Township</span><br>';
     div.innerHTML += '<i style="background: #85929E"></i><span>Parcel</span><br>';
-    // div.innerHTML += '<i style="background: #E8E6E0"></i><span>Zipcode</span><br>';
-    
-    return div;
-  };
-
-  legend.addTo(map);
-};
-
-function createParcelPopup(properties){
- 
-  var popUp= "<p><b>Parcel: </b> " + properties.attribute;
-  return popUp; 
-}; 
-
-// Set up style for parcel polys
-function parcelStyle(feature) {
-  return {
-    color: '#85929E',
-    weight: 1,
-  };
-}
-
-function townshipStyle(feature){
-  return{
-    color: "#4C0073", 
-    weight: 2,
-  }
-}
-function countyStyle(feature){
-  return{
-    color: "#ffffff",
-    weight: 1,
   
+        return div;
   };
-}
-// Blue symbol for selected parcels
+  
+  legend.addTo(map);
+  function createParcelPopup(properties){
+ 
+    var popUp= "<p><b>Parcel: </b> " + properties.attribute;
+    return popUp; 
+  }; 
+  
+  // Blue symbol for selected parcels
 function parcelSelectedStyle(feature) {
   return {
     // fillColor: "#00FFFB",
@@ -189,21 +183,21 @@ function parcelSelectedStyle(feature) {
     weight: 2
   };
 }
+  map.addEventListener('click', function(e) {
+    if (selection) {
+       gardenLayer.resetStyle(selection);
+  
+       selection = null;
+    }
+  });
+  removeEventListener('click', function(e) {
+    if (selection) {
+       gardenLayer.resetStyle(selection);
+  
+       selection = null;
+    }
+  });
+};
 
-// define and register event handler for click events to unselect features when clicked anywhere else on the map
-map.addEventListener('click', function(e) {
-  if (selection) {
-     parcelLayer.resetStyle(selection);
-
-     selection = null;
-  }
-});
-removeEventListener('click', function(e) {
-  if (selection) {
-     parcelLayer.resetStyle(selection);
-
-     selection = null;
-  }
-});
-
-document.addEventListener('DOMContentLoaded',createMap)
+// Initialize the map
+document.addEventListener('DOMContentLoaded', createMap);

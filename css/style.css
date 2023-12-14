@@ -70,4 +70,11 @@ label {
 .leaflet-popup-content p {
   margin: 0.2em 0;
 }
-
+#info-pane {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 400;
+  padding: 1em;
+  background: white;
+}
