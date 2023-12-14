@@ -56,8 +56,8 @@ function parcelOnEachFeature(feature, layer){
     style: townshipStyle
   }).addTo(map);
  
-
-
+onDropdownChange("Choose a Township");
+createHighlightStyle("Choose a Township");
   console.log(townshipLayer);
   var countyLayer = L.esri.featureLayer({
     url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1",
@@ -110,6 +110,17 @@ function parcelOnEachFeature(feature, layer){
 
 }
 }
+function createHighlightStyle(selectedTownship) {
+  if (selectedTownship !== "Choose a Township") {
+    townshipLayer.query().where("Name = '" + selectedTownship + "'").run(function(error, featureCollection){
+      if (error) {
+        console.error('Query error:', error);
+  return {
+    color: '#00FFFB',
+    weight: 2
+  };
+}
+})}};
 
   // Add the control layers
   var baseMaps = {
