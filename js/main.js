@@ -28,51 +28,125 @@ function parcelSelectedStyle() {
 var map;
 var townshipLayer;
 var selection;
+var allLayers = {}; // Store all layers for easy management
 
 function createMap(){
   // Create the map
   map = L.map('map').setView([45.87, -87], 9);
   // Add OSM base tilelayer
   L.tileLayer.provider('Stadia.AlidadeSmoothDark').addTo(map);
-  // Add other layers
+  
   // define function to handle click events on parcels
-// define function to handle click events on parcels
-function parcelOnEachFeature(feature, layer){
-  layer.on({
-    click: function(e) {
-      if (selection) {
-        parcelLayer.resetStyle(selection);
-      }
-              
-      e.target.setStyle(parcelSelectedStyle());
-      selection = e.target;
+  function parcelOnEachFeature(feature, layer){
+    layer.on({
+      click: function(e) {
+        if (selection) {
+          if (allLayers.parcels) {
+            allLayers.parcels.resetStyle(selection);
+          }
+        }
+                
+        e.target.setStyle(parcelSelectedStyle());
+        selection = e.target;
 
-      L.DomEvent.stopPropagation(e); // stop click event from being propagated down to other elements
+        L.DomEvent.stopPropagation(e); // stop click event from being propagated down to other elements
+      }
+    });
+  }
+  
+  // Layer configuration - Update these URLs with your actual layer URLs from the target web map
+  var layerConfigs = [
+    {
+      name: 'townships',
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/YourNewService/FeatureServer/0", // Update this URL
+      style: townshipStyle,
+      displayName: "Township"
+    },
+    {
+      name: 'counties',
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/YourNewService/FeatureServer/1", // Update this URL
+      style: countyStyle,
+      displayName: "County"
+    },
+    {
+      name: 'parcels',
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/YourNewService/FeatureServer/2", // Update this URL
+      style: parcelStyle,
+      displayName: "Parcel",
+      onEachFeature: parcelOnEachFeature
+    },
+    // Add more layers from your target web map here
+    {
+      name: 'roads',
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/YourNewService/FeatureServer/3", // Update this URL
+      style: {
+        color: '#FF5733',
+        weight: 2
+      },
+      displayName: "Roads"
+    },
+    {
+      name: 'zoning',
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/YourNewService/FeatureServer/4", // Update this URL
+      style: {
+        color: '#33FF57',
+        weight: 1,
+        fillOpacity: 0.3
+      },
+      displayName: "Zoning"
+    }
+  ];
+  
+  // Add layers with error handling
+  layerConfigs.forEach(function(config) {
+    try {
+      var layerOptions = {
+        url: config.url,
+        style: config.style
+      };
+      
+      if (config.onEachFeature) {
+        layerOptions.onEachFeature = config.onEachFeature;
+      }
+      
+      var layer = L.esri.featureLayer(layerOptions);
+      
+      layer.on('error', function(error) {
+        console.error(`Error loading ${config.displayName} layer:`, error);
+      });
+      
+      layer.on('loading', function() {
+        console.log(`Loading ${config.displayName} layer...`);
+      });
+      
+      layer.on('load', function() {
+        console.log(`${config.displayName} layer loaded successfully`);
+      });
+      
+      layer.addTo(map);
+      allLayers[config.name] = layer;
+      
+      // Set specific layer references for existing functionality
+      if (config.name === 'townships') {
+        townshipLayer = layer;
+      }
+      
+    } catch (error) {
+      console.error(`Failed to create ${config.displayName} layer:`, error);
     }
   });
-}
-  townshipLayer = L.esri.featureLayer({
-    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/6",
-    style: townshipStyle
-  }).addTo(map);
- 
-onDropdownChange("Choose a Township");
-createHighlightStyle("Choose a Township");
+  
+  // Add popup for parcels
+  if (allLayers.parcels) {
+    allLayers.parcels.bindPopup(function(layer){
+      return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
+    });
+  }
+
+  // Initialize dropdown and highlight functionality
+  onDropdownChange("Choose a Township");
+  createHighlightStyle("Choose a Township");
   console.log(townshipLayer);
-  var countyLayer = L.esri.featureLayer({
-    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/1",
-    style: countyStyle,
-  pane:"townshipLayer"
-  }).addTo(map);
-  var parcelLayer = L.esri.featureLayer({
-    url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Parcel_Viewer_WFL1/FeatureServer/3",
-    style: parcelStyle,
-    onEachFeature: parcelOnEachFeature
-    
-  }).addTo(map);
-  parcelLayer.bindPopup(function(layer){
-    return L.Util.template('<p><b>Parcel ID: </b> {Name}</p>'+'<p><b>Township: </b> {Township}</p>'+'<p><b>Zip Code: </b> {Zip_Code}</p>', layer.feature.properties);
-  });
   // Define the dropdown change handler function
   function onDropdownChange(selectedTownship) {
     if (selectedTownship !== "Choose a Township") {
@@ -85,11 +159,11 @@ createHighlightStyle("Choose a Township");
           var bounds = L.geoJson(featureCollection).getBounds();
           map.fitBounds(bounds);
            // Reset the style of all township features
-        townshipLayer.setStyle(townshipStyle);
+        if (townshipLayer) townshipLayer.setStyle(townshipStyle);
         // Reset the style of all parcel features
-        parcelLayer.setStyle(parcelStyle);
+        if (allLayers.parcels) allLayers.parcels.setStyle(parcelStyle);
         // Reset the style of all county features
-        countyLayer.setStyle(countyStyle);
+        if (allLayers.counties) allLayers.counties.setStyle(countyStyle);
         // Zoom to the selected township feature
         map.fitBounds(townshipLayer.getBounds());
         // Get the selected township feature
@@ -125,13 +199,22 @@ function createHighlightStyle(selectedTownship) {
   // Add the control layers
   var baseMaps = {
     "Stadia.AlidadeSmoothDark": L.tileLayer.provider('Stadia.AlidadeSmoothDark'),
-    "Stadia.StamenTerrain": L.tileLayer.provider('Stadia.StamenTerrain')
+    "Stadia.StamenTerrain": L.tileLayer.provider('Stadia.StamenTerrain'),
+    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }),
+    "Esri WorldImagery": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    })
   };
-  var overlayMaps = {
-    "Township": townshipLayer,
-    "County": countyLayer,
-    "Parcel": parcelLayer
-  };
+  
+  // Build overlay maps dynamically from loaded layers
+  var overlayMaps = {};
+  layerConfigs.forEach(function(config) {
+    if (allLayers[config.name]) {
+      overlayMaps[config.displayName] = allLayers[config.name];
+    }
+  });
   L.control.layers(baseMaps, overlayMaps).addTo(map);
   // Define the QueryControl
   L.Control.QueryControl = L.Control.extend({
@@ -178,11 +261,16 @@ function createHighlightStyle(selectedTownship) {
   legend.onAdd = function(map) {
     var div = L.DomUtil.create('div', 'legend');
     div.innerHTML += "<h4>Legend</h4>";
-    div.innerHTML += '<i style="background: #FFFFFF"></i><span>County</span><br>';
-    div.innerHTML += '<i style="background: #4C0073"></i><span>Township</span><br>';
-    div.innerHTML += '<i style="background: #85929E"></i><span>Parcel</span><br>';
+    
+    // Add legend items based on layer configuration
+    layerConfigs.forEach(function(config) {
+      if (allLayers[config.name]) {
+        var color = config.style.color || '#85929E';
+        div.innerHTML += `<i style="background: ${color}"></i><span>${config.displayName}</span><br>`;
+      }
+    });
   
-        return div;
+    return div;
   };
   
   legend.addTo(map);
@@ -202,15 +290,18 @@ function parcelSelectedStyle(feature) {
 }
   map.addEventListener('click', function(e) {
     if (selection) {
-       parcelLayer.resetStyle(selection);
-  
+       if (allLayers.parcels) {
+         allLayers.parcels.resetStyle(selection);
+       }
        selection = null;
     }
   });
-  removeEventListener('click', function(e) {
-    if (selection) {
-       parcelLayer.resetStyle(selection);
   
+  map.removeEventListener('click', function(e) {
+    if (selection) {
+       if (allLayers.parcels) {
+         allLayers.parcels.resetStyle(selection);
+       }
        selection = null;
     }
   });
